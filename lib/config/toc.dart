@@ -5,6 +5,7 @@ import 'package:markdown_widget/toc_widget.dart';
 
 import '../widget/blocks/leaf/heading.dart';
 import '../widget/markdown.dart';
+import '../widget/span_node.dart';
 
 ///[TocController] combines [TocWidget] and [MarkdownWidget],
 ///you can use it to control the jump between the two,
@@ -31,6 +32,10 @@ class TocController extends ChangeNotifier {
 
   void jumpToIndex(int index) {
     jumpIndex.value = getTocByWidgetIndex(index)?.widgetIndex;
+  }
+
+  void jumpToWidgetIndex(int widgetIndex) {
+    jumpIndex.value = widgetIndex;
   }
 
   Toc? getTocByWidgetIndex(int index) {
@@ -63,5 +68,19 @@ class Toc {
     required this.node,
     this.widgetIndex = 0,
     this.selfIndex = 0,
+  });
+}
+
+///config for toc
+class ContentNode {
+  ///the HeadingNode
+  final ElementNode node;
+
+  ///index of [MarkdownGenerator]'s _children
+  final int widgetIndex;
+
+  ContentNode({
+    required this.node,
+    this.widgetIndex = 0,
   });
 }
