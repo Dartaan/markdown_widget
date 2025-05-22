@@ -33,6 +33,10 @@ class TocController extends ChangeNotifier {
     jumpIndex.value = getTocByWidgetIndex(index)?.widgetIndex;
   }
 
+  void jumpToWidgetIndex(int widgetIndex) {
+    jumpIndex.value = widgetIndex;
+  }
+
   Toc? getTocByWidgetIndex(int index) {
     if (_index2toc.containsKey(index)) {
       return _index2toc[index];
