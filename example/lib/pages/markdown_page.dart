@@ -109,7 +109,13 @@ class _MarkdownPageState extends State<MarkdownPage> {
                 config: config.copy(configs: [
                   isDark
                       ? PreConfig.darkConfig.copy(wrapper: codeWrapper)
-                      : PreConfig().copy(wrapper: codeWrapper)
+                      : PreConfig().copy(wrapper: codeWrapper),
+                  H1Config(builder: _headingBuilder),
+                  H2Config(builder: _headingBuilder),
+                  H3Config(builder: _headingBuilder),
+                  H4Config(builder: _headingBuilder),
+                  H5Config(builder: _headingBuilder),
+                  H6Config(builder: _headingBuilder),
                 ]),
                 tocController: controller,
                 markdownGenerator: MarkdownGenerator(
@@ -120,6 +126,37 @@ class _MarkdownPageState extends State<MarkdownPage> {
                   richTextBuilder: (span) => Text.rich(span),
                 ));
           }),
+    );
+  }
+
+  InlineSpan _headingBuilder(HeadingNode node, Widget? divider) {
+    final headingWidget = Row(
+      children: [
+        IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.link),
+        ),
+        ProxyRichText(
+          node.childrenSpan,
+          richTextBuilder: node.visitor.richTextBuilder,
+        ),
+      ],
+    );
+
+    if (divider == null) return WidgetSpan(child: headingWidget);
+
+    return WidgetSpan(
+      child: Padding(
+        padding: node.headingConfig.padding,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            headingWidget,
+            divider,
+          ],
+        ),
+      ),
     );
   }
 
