@@ -42,6 +42,19 @@ class _MarkdownPageState extends State<MarkdownPage> {
     } else {
       this.data = widget.markdownData!;
     }
+
+    // Handle URL fragments for deep linking
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final uri = Uri.base;
+      if (uri.hasFragment) {
+        final slug = uri.fragment;
+        // Wait for TOC to be populated
+        Future.delayed(Duration(milliseconds: 500), () {
+          controller.jumpToSlug(slug);
+        });
+      }
+    });
+
     super.initState();
   }
 
@@ -130,15 +143,46 @@ class _MarkdownPageState extends State<MarkdownPage> {
   }
 
   InlineSpan _headingBuilder(HeadingNode node, Widget? divider) {
+    final slug = node.markdownNode?.textContent;
     final headingWidget = Row(
       children: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            if (slug != null) {
+              final url = Uri.base.toString().split('#')[0] + '#' + slug;
+              Clipboard.setData(ClipboardData(text: url));
+              Widget toastWidget = Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 50),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xff006EDF), width: 2),
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                      color: Color(0xff007FFF)),
+                  width: 200,
+                  height: 40,
+                  child: Center(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Text(
+                        isEnglish ? 'Deep link copied!' : '深层链接已复制!',
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+              ToastWidget().showToast(context, toastWidget, 1000);
+            }
+          },
           icon: Icon(Icons.link),
+          tooltip: isEnglish ? 'Copy deep link' : '复制深层链接',
         ),
-        ProxyRichText(
-          node.childrenSpan,
-          richTextBuilder: node.visitor.richTextBuilder,
+        Expanded(
+          child: ProxyRichText(
+            node.childrenSpan,
+            richTextBuilder: node.visitor.richTextBuilder,
+          ),
         ),
       ],
     );

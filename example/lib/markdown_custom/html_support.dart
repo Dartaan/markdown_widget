@@ -91,7 +91,9 @@ class HtmlToSpanVisitor extends TreeVisitor {
     final last = _spansStack.last;
     if (last is ElementNode) {
       final textNode = TextNode(text: node.text);
-      last.accept(textNode);
+      // Создаем простой markdown узел на основе html-текста
+      final mTextNode = m.Text(node.text);
+      last.accept(textNode, mTextNode);
     }
   }
 
@@ -103,12 +105,12 @@ class HtmlToSpanVisitor extends TreeVisitor {
     SpanNode spanNode = visitor.getNodeByElement(mdElement, visitor.config);
     if (spanNode is! ElementNode) {
       final n = ConcreteElementNode(tag: localName, style: parentStyle);
-      n.accept(spanNode);
+      n.accept(spanNode, mdElement);
       spanNode = n;
     }
     final last = _spansStack.last;
     if (last is ElementNode) {
-      last.accept(spanNode);
+      last.accept(spanNode, mdElement);
     }
     _spansStack.add(spanNode);
     for (var child in node.nodes.toList(growable: false)) {

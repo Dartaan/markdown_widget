@@ -30,19 +30,25 @@ class CustomTextNode extends ElementNode {
     final textStyle = config.p.textStyle.merge(parentStyle);
     children.clear();
     if (!text.contains(htmlRep)) {
-      accept(TextNode(text: text, style: textStyle));
+      // Создаем простой текстовый узел markdown
+      final mTextNode = m.Text(text);
+      accept(TextNode(text: text, style: textStyle), mTextNode);
       return;
     }
     //Intercept as table tag
     if (text.contains(tableRep)) {
       isTable = true;
-      accept(parent);
+      // Используем текущий markdownNode или создаем новый
+      final mNode = markdownNode ?? m.Text(text);
+      accept(parent, mNode);
       return;
     }
 
     //The remaining ones are processed by the regular HTML processing.
+    // Создаем markdown узел из текста
+    final mTextNode = m.Text(text);
     final spans = parseHtml(
-      m.Text(text),
+      mTextNode,
       visitor: WidgetVisitor(
         config: visitor.config,
         generators: visitor.generators,
@@ -52,7 +58,8 @@ class CustomTextNode extends ElementNode {
     );
     spans.forEach((element) {
       isTable = false;
-      accept(element);
+      // Используем одинаковый markdown узел для всех элементов
+      accept(element, mTextNode);
     });
   }
 }
