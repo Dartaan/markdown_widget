@@ -76,7 +76,7 @@ class WidgetVisitor implements m.NodeVisitor {
     final node = getNodeByElement(element, config);
     final last = _spansStack.last;
     if (last is ElementNode) {
-      last.accept(node);
+      last.accept(node, element);
       onNodeAccepted?.call(node, _currentSpanIndex);
     }
     _spansStack.add(node);
@@ -95,7 +95,7 @@ class WidgetVisitor implements m.NodeVisitor {
     if (last is ElementNode) {
       final textNode = textGenerator?.call(text, config, this) ??
           TextNode(text: text.text, style: config.p.textStyle);
-      last.accept(textNode);
+      last.accept(textNode, text);
       onNodeAccepted?.call(textNode, _currentSpanIndex);
     }
   }

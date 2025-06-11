@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:markdown/markdown.dart' as m show Node;
 
 ///the basic node
 abstract class SpanNode {
@@ -8,13 +9,18 @@ abstract class SpanNode {
 
   TextStyle? style;
 
+  m.Node? _markdownNode;
+
   TextStyle? get parentStyle => _parent?.style;
 
   SpanNode? get parent => _parent;
 
+  m.Node? get markdownNode => _markdownNode;
+
   ///use [_acceptParent] to accept a parent
-  void _acceptParent(SpanNode node) {
+  void _acceptParent(SpanNode node, m.Node markdownNode) {
     _parent = node;
+    _markdownNode = markdownNode;
     onAccepted(node);
   }
 
@@ -27,9 +33,9 @@ abstract class ElementNode extends SpanNode {
   final List<SpanNode> children = [];
 
   ///use [accept] to add a child
-  void accept(SpanNode? node) {
+  void accept(SpanNode? node, m.Node markdownNode) {
     if (node != null) children.add(node);
-    node?._acceptParent(this);
+    node?._acceptParent(this, markdownNode);
   }
 
   @override

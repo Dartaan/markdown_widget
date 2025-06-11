@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:markdown/markdown.dart' as m;
 import '../../../config/configs.dart';
 import '../../proxy_rich_text.dart';
 import '../../span_node.dart';
 import '../../widget_visitor.dart';
+
+typedef HeadingBuilder = InlineSpan Function(HeadingNode node, Widget? divider);
 
 ///Tag: [MarkdownTag.h1] ~ [MarkdownTag.h6]
 ///
@@ -17,6 +20,17 @@ class HeadingNode extends ElementNode {
 
   @override
   InlineSpan build() {
+    if (headingConfig.builder != null) {
+      return headingConfig.builder!.call(
+        this,
+        headingConfig.divider != null
+            ? _Divider(
+                divider: headingConfig.divider!.copy(
+                color: parentStyle?.color,
+              ))
+            : null,
+      );
+    }
     final divider = headingConfig.divider;
     if (divider == null) return childrenSpan;
     return WidgetSpan(
@@ -40,7 +54,14 @@ class HeadingNode extends ElementNode {
   HeadingNode copy({HeadingConfig? headingConfig}) {
     final node = HeadingNode(headingConfig ?? this.headingConfig, visitor);
     for (var e in children) {
-      node.accept(e);
+      if (e.markdownNode != null) {
+        node.accept(e, e.markdownNode!);
+      } else if (markdownNode != null) {
+        node.accept(e, markdownNode!);
+      } else {
+        final emptyNode = m.Text("");
+        node.accept(e, emptyNode);
+      }
     }
     return node;
   }
@@ -94,13 +115,15 @@ class HeadingDivider {
 
 ///config class for heading
 abstract class HeadingConfig implements LeafConfig {
-  const HeadingConfig();
+  const HeadingConfig({this.builder});
 
   TextStyle get style;
 
   HeadingDivider? get divider => null;
 
   EdgeInsets get padding => EdgeInsets.only(top: 8, bottom: 4);
+
+  final HeadingBuilder? builder;
 }
 
 ///config class for h1
@@ -108,12 +131,14 @@ class H1Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H1Config(
-      {this.style = const TextStyle(
-        fontSize: 32,
-        height: 40 / 32,
-        fontWeight: FontWeight.bold,
-      )});
+  const H1Config({
+    this.style = const TextStyle(
+      fontSize: 32,
+      height: 40 / 32,
+      fontWeight: FontWeight.bold,
+    ),
+    super.builder,
+  });
 
   @nonVirtual
   @override
@@ -136,12 +161,14 @@ class H2Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H2Config(
-      {this.style = const TextStyle(
-        fontSize: 24,
-        height: 30 / 24,
-        fontWeight: FontWeight.bold,
-      )});
+  const H2Config({
+    this.style = const TextStyle(
+      fontSize: 24,
+      height: 30 / 24,
+      fontWeight: FontWeight.bold,
+    ),
+    super.builder,
+  });
 
   @nonVirtual
   @override
@@ -164,12 +191,14 @@ class H3Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H3Config(
-      {this.style = const TextStyle(
-        fontSize: 20,
-        height: 25 / 20,
-        fontWeight: FontWeight.bold,
-      )});
+  const H3Config({
+    this.style = const TextStyle(
+      fontSize: 20,
+      height: 25 / 20,
+      fontWeight: FontWeight.bold,
+    ),
+    super.builder,
+  });
 
   @nonVirtual
   @override
@@ -192,12 +221,14 @@ class H4Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H4Config(
-      {this.style = const TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        fontWeight: FontWeight.bold,
-      )});
+  const H4Config({
+    this.style = const TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      fontWeight: FontWeight.bold,
+    ),
+    super.builder,
+  });
 
   @nonVirtual
   @override
@@ -217,12 +248,14 @@ class H5Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H5Config(
-      {this.style = const TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        fontWeight: FontWeight.bold,
-      )});
+  const H5Config({
+    this.style = const TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      fontWeight: FontWeight.bold,
+    ),
+    super.builder,
+  });
 
   @nonVirtual
   @override
@@ -242,12 +275,14 @@ class H6Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H6Config(
-      {this.style = const TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        fontWeight: FontWeight.bold,
-      )});
+  const H6Config({
+    this.style = const TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      fontWeight: FontWeight.bold,
+    ),
+    super.builder,
+  });
 
   @nonVirtual
   @override

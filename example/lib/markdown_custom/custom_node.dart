@@ -29,20 +29,23 @@ class CustomTextNode extends ElementNode {
   void onAccepted(SpanNode parent) {
     final textStyle = config.p.textStyle.merge(parentStyle);
     children.clear();
+    final mTextNode = m.Text(text);
+    final mNode = markdownNode ?? mTextNode;
+
     if (!text.contains(htmlRep)) {
-      accept(TextNode(text: text, style: textStyle));
+      accept(TextNode(text: text, style: textStyle), mNode);
       return;
     }
     //Intercept as table tag
     if (text.contains(tableRep)) {
       isTable = true;
-      accept(parent);
+      accept(parent, mNode);
       return;
     }
 
     //The remaining ones are processed by the regular HTML processing.
     final spans = parseHtml(
-      m.Text(text),
+      mTextNode,
       visitor: WidgetVisitor(
         config: visitor.config,
         generators: visitor.generators,
@@ -52,7 +55,7 @@ class CustomTextNode extends ElementNode {
     );
     spans.forEach((element) {
       isTable = false;
-      accept(element);
+      accept(element, mNode);
     });
   }
 }

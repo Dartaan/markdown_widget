@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:markdown/markdown.dart' as m;
 import 'package:markdown_widget/toc_widget.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -81,7 +82,7 @@ void main() {
       ));
       final list = List.generate(10, (index) {
         final heading = HeadingNode(H1Config(), WidgetVisitor());
-        heading.accept(TextNode(text: "$index"));
+        heading.accept(TextNode(text: "$index"), m.Text("$index"));
         return Toc(
           node: heading,
           widgetIndex: index,

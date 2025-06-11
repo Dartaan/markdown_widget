@@ -42,6 +42,7 @@ class _MarkdownPageState extends State<MarkdownPage> {
     } else {
       this.data = widget.markdownData!;
     }
+
     super.initState();
   }
 
@@ -109,7 +110,13 @@ class _MarkdownPageState extends State<MarkdownPage> {
                 config: config.copy(configs: [
                   isDark
                       ? PreConfig.darkConfig.copy(wrapper: codeWrapper)
-                      : PreConfig().copy(wrapper: codeWrapper)
+                      : PreConfig().copy(wrapper: codeWrapper),
+                  H1Config(builder: _headingBuilder),
+                  H2Config(builder: _headingBuilder),
+                  H3Config(builder: _headingBuilder),
+                  H4Config(builder: _headingBuilder),
+                  H5Config(builder: _headingBuilder),
+                  H6Config(builder: _headingBuilder),
                 ]),
                 tocController: controller,
                 markdownGenerator: MarkdownGenerator(
@@ -120,6 +127,81 @@ class _MarkdownPageState extends State<MarkdownPage> {
                   richTextBuilder: (span) => Text.rich(span),
                 ));
           }),
+    );
+  }
+
+  static String? generateFragment(String? text) {
+    if (text == null || text.isEmpty) return null;
+
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '-')
+        .trim();
+  }
+
+  InlineSpan _headingBuilder(HeadingNode node, Widget? divider) {
+    final fragment = generateFragment(node.markdownNode?.textContent);
+    final headingWidget = Row(
+      children: [
+        IconButton(
+          onPressed: () {
+            if (fragment != null) {
+              final url = Uri.base.toString().split('#')[0] + '#' + fragment;
+              Clipboard.setData(ClipboardData(text: url));
+              Widget toastWidget = Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 50),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xff006EDF), width: 2),
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                      color: Color(0xff007FFF)),
+                  width: 200,
+                  height: 40,
+                  child: Center(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Text(
+                        isEnglish ? 'Deep link copied!' : '深层链接已复制!',
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+              ToastWidget().showToast(context, toastWidget, 1000);
+
+              final index = controller.getNodeIndex(node);
+              if (index != null) controller.jumpToIndex(index);
+            }
+          },
+          icon: Icon(Icons.link),
+          tooltip: isEnglish ? 'Copy deep link' : '复制深层链接',
+        ),
+        Expanded(
+          child: ProxyRichText(
+            node.childrenSpan,
+            richTextBuilder: node.visitor.richTextBuilder,
+          ),
+        ),
+      ],
+    );
+
+    if (divider == null) return WidgetSpan(child: headingWidget);
+
+    return WidgetSpan(
+      child: Padding(
+        padding: node.headingConfig.padding,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            headingWidget,
+            divider,
+          ],
+        ),
+      ),
     );
   }
 

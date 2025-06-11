@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:markdown/markdown.dart' as m;
 
 import '../../../config/configs.dart';
 import '../../inlines/input.dart';
@@ -23,8 +24,8 @@ class UlOrOLNode extends ElementNode {
   }
 
   @override
-  void accept(SpanNode? node) {
-    super.accept(node);
+  void accept(SpanNode? node, m.Node markdownNode) {
+    super.accept(node, markdownNode);
     if (node != null && node is ListNode) {
       node._index = start;
       start++;
