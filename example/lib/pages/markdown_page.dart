@@ -130,14 +130,24 @@ class _MarkdownPageState extends State<MarkdownPage> {
     );
   }
 
+  static String? generateFragment(String? text) {
+    if (text == null || text.isEmpty) return null;
+
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '-')
+        .trim();
+  }
+
   InlineSpan _headingBuilder(HeadingNode node, Widget? divider) {
-    final slug = node.markdownNode?.textContent;
+    final fragment = generateFragment(node.markdownNode?.textContent);
     final headingWidget = Row(
       children: [
         IconButton(
           onPressed: () {
-            if (slug != null) {
-              final url = Uri.base.toString().split('#')[0] + '#' + slug;
+            if (fragment != null) {
+              final url = Uri.base.toString().split('#')[0] + '#' + fragment;
               Clipboard.setData(ClipboardData(text: url));
               Widget toastWidget = Align(
                 alignment: Alignment.bottomCenter,
@@ -161,6 +171,9 @@ class _MarkdownPageState extends State<MarkdownPage> {
                 ),
               );
               ToastWidget().showToast(context, toastWidget, 1000);
+
+              final index = controller.getNodeIndex(node);
+              if (index != null) controller.jumpToIndex(index);
             }
           },
           icon: Icon(Icons.link),

@@ -44,6 +44,15 @@ class TocController extends ChangeNotifier {
     return null;
   }
 
+  int? getNodeIndex(HeadingNode node) {
+    for (var entry in _index2toc.entries) {
+      if (entry.value.node == node) {
+        return entry.key;
+      }
+    }
+    return null;
+  }
+
   @override
   void dispose() {
     currentScrollIndex.dispose();
