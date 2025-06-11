@@ -29,15 +29,6 @@ class TocController extends ChangeNotifier {
     currentScrollIndex.value = getTocByWidgetIndex(index)?.widgetIndex;
   }
 
-  int? getNodeIndex(HeadingNode node) {
-    for (var entry in _index2toc.entries) {
-      if (entry.value.node == node) {
-        return entry.key;
-      }
-    }
-    return null;
-  }
-
   void jumpToIndex(int index) {
     jumpIndex.value = getTocByWidgetIndex(index)?.widgetIndex;
   }
@@ -51,24 +42,6 @@ class TocController extends ChangeNotifier {
       return _index2toc[index];
     }
     return null;
-  }
-
-  /// Find a Toc entry by its slug
-  Toc? getTocBySlug(String slug) {
-    for (var toc in _index2toc.values) {
-      if (toc.slug == slug) {
-        return toc;
-      }
-    }
-    return null;
-  }
-
-  /// Jump to a heading identified by its slug
-  void jumpToSlug(String slug) {
-    final toc = getTocBySlug(slug);
-    if (toc != null) {
-      jumpIndex.value = toc.widgetIndex;
-    }
   }
 
   @override
@@ -90,28 +63,9 @@ class Toc {
   ///index of [TocController.tocList]
   final int selfIndex;
 
-  /// URL-friendly slug generated from heading text
-  late final String? slug;
-
   Toc({
     required this.node,
     this.widgetIndex = 0,
     this.selfIndex = 0,
-  }) {
-    // Generate slug from heading text
-    slug = generateSlug(node.textContent);
-  }
-
-  /// Generates a URL-friendly slug from heading text
-  static String? generateSlug(String? text) {
-    if (text == null || text.isEmpty) return null;
-    
-    // Convert to lowercase, replace spaces with hyphens, remove special characters
-    return text
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^\w\s-]'), '') // Remove special characters
-        .replaceAll(RegExp(r'\s+'), '-')     // Replace spaces with hyphens
-        .replaceAll(RegExp(r'-+'), '-')      // Replace multiple hyphens with single hyphen
-        .trim();
-  }
+  });
 }

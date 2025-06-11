@@ -91,7 +91,6 @@ class HtmlToSpanVisitor extends TreeVisitor {
     final last = _spansStack.last;
     if (last is ElementNode) {
       final textNode = TextNode(text: node.text);
-      // Создаем простой markdown узел на основе html-текста
       final mTextNode = m.Text(node.text);
       last.accept(textNode, mTextNode);
     }

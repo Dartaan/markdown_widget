@@ -82,8 +82,7 @@ void main() {
       ));
       final list = List.generate(10, (index) {
         final heading = HeadingNode(H1Config(), WidgetVisitor());
-        heading.accept(
-            TextNode(text: "$index"), m.Element('p', [m.Text("$index")]));
+        heading.accept(TextNode(text: "$index"), m.Text("$index"));
         return Toc(
           node: heading,
           widgetIndex: index,

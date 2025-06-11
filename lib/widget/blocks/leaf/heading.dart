@@ -6,7 +6,6 @@ import '../../proxy_rich_text.dart';
 import '../../span_node.dart';
 import '../../widget_visitor.dart';
 
-// Добавьте это в начало файла вместе с другими импортами
 typedef HeadingBuilder = InlineSpan Function(HeadingNode node, Widget? divider);
 
 ///Tag: [MarkdownTag.h1] ~ [MarkdownTag.h6]
@@ -18,24 +17,6 @@ class HeadingNode extends ElementNode {
   final WidgetVisitor visitor;
 
   HeadingNode(this.headingConfig, this.visitor);
-
-  /// Получить текстовое содержимое заголовка из связанного markdown-узла
-  String? get textContent {
-    // Если есть markdown-узел, берем из него текстовое содержимое
-    if (markdownNode != null) {
-      return markdownNode?.textContent;
-    }
-
-    // Запасной вариант - собираем из дочерних TextNode
-    final buffer = StringBuffer();
-    for (var child in children) {
-      if (child is TextNode) {
-        buffer.write(child.text);
-      }
-    }
-    final result = buffer.toString().trim();
-    return result.isNotEmpty ? result : null;
-  }
 
   @override
   InlineSpan build() {
@@ -73,13 +54,11 @@ class HeadingNode extends ElementNode {
   HeadingNode copy({HeadingConfig? headingConfig}) {
     final node = HeadingNode(headingConfig ?? this.headingConfig, visitor);
     for (var e in children) {
-      // Если у нас есть markdownNode, мы можем его использовать
       if (e.markdownNode != null) {
         node.accept(e, e.markdownNode!);
       } else if (markdownNode != null) {
         node.accept(e, markdownNode!);
       } else {
-        // В крайнем случае создаем временный узел
         final emptyNode = m.Text("");
         node.accept(e, emptyNode);
       }

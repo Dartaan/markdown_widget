@@ -43,18 +43,6 @@ class _MarkdownPageState extends State<MarkdownPage> {
       this.data = widget.markdownData!;
     }
 
-    // Handle URL fragments for deep linking
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final uri = Uri.base;
-      if (uri.hasFragment) {
-        final slug = uri.fragment;
-        // Wait for TOC to be populated
-        Future.delayed(Duration(milliseconds: 500), () {
-          controller.jumpToSlug(slug);
-        });
-      }
-    });
-
     super.initState();
   }
 
